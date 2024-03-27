@@ -18,14 +18,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 )
 
 type Email struct {
 	Email string
 }
+
+var now time.Time
+var replacer = strings.NewReplacer(" ", "_")
 
 func main() {
 	// http.HandleFunc("/", handleEmail)
@@ -33,6 +37,9 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/email", handleEmail)
 	err := http.ListenAndServe(":8080", mux)
+
+	// Timestamp for file
+	now = time.Now()
 
 	if errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
@@ -49,6 +56,18 @@ func handleEmail(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	log.Println(t)
+	// TODO: Save to file
+	// saveFile, err := os.OpenFile(replacer.Replace(now.Format("Mon Jan 2 15:04:05 MST 2006")), os.O_APPEND|os.O_CREATE, 0644)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// defer saveFile.Close()
+	// f := bufio.NewWriter(saveFile)
+	// _, err = f.Write([]byte(t.Email + "\n"))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// f.Flush()
+	fmt.Println(t.Email)
 	fmt.Fprintf(w, "Email: %+v", t.Email)
 }
